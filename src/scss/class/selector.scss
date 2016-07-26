@@ -1,39 +1,37 @@
 @import 'utils';
 
+// Add property block-tag + getter/setter + setup on get-print method
+// Add property element-tag + getter/setter + setup on get-print method
+// Add property block-state + getter/setter + setup on get-print method
+// Add property element-state + getter/setter + setup on get-print method
+// Add property prefix + getter/setter + setup on get-print method
+
 $selector--prototype: (
   '~': (
     'classname': 'selector',
   ),
   'block': (
     'type': 'string',
-    'nullable': false,
-    'value': null,
   ),
   'element': (
     'type': 'string',
     'nullable': true,
-    'value': null,
   ),
   'modifier': (
     'type': 'string',
     'nullable': true,
-    'value': null,
+    'collection': true,
   ),
   'pseudo-element': (
     'type': 'string',
     'nullable': true,
-    'value': null,
   ),
   'type': (
     'type': 'string',
-    'nullable': false,
     'choices': ('.', '#'),
-    'value': null,
   ),
   'is-nested': (
     'type': 'bool',
-    'nullable': false,
-    'value': null,
   ),
 );
 
@@ -92,8 +90,8 @@ $selector--prototype: (
 /// @group class selector
 /// @param {map} $this - the `selector class object`
 /// @return {string} modifier
-@function selector--get-modifier($this) {
-  @return class--get-attribute-value($this, 'modifier');
+@function selector--get-modifier($this, $nth: null) {
+  @return class--get-attribute-value($this, 'modifier', $nth);
 }
 
 /// @name set modifier
@@ -104,6 +102,17 @@ $selector--prototype: (
 /// @return {map} selector class object updated with new 'modifier' value
 @function selector--set-modifier($this, $modifier) {
   @return class--set-attribute-value($this, 'modifier', $modifier);
+}
+
+/// @name append modifier
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $modifier
+/// @return {map} selector class object updated with new 'modifier' appended to the previous list
+@function selector--append-modifier($this, $modifier) {
+  $previous-value: selector--get-modifier($this);
+  @return class--set-attribute-value($this, 'modifier', $modifier, $previous-value);
 }
 
 /// @name get type
@@ -217,7 +226,10 @@ $selector--prototype: (
   $print--element: '';
 
   @if selector--is-modifier($this) {
-    $print--modifier: $print--block + '--' + selector--get-modifier($this);
+    $print--modifier: '';
+    @for $index from 1 through length(selector--get-modifier($this)) {
+      $print--modifier: $print--modifier + $print--block + '--' + selector--get-modifier($this, $index);
+    }
   }
 
   @if selector--is-element($this) {
