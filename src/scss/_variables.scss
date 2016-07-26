@@ -1,0 +1,79 @@
+$button--prefix: 'c-' !default;
+
+// Positioning
+$button--vertical-align: middle !default;
+
+// Display & Box Model
+$button--border-width: 1px !default;
+$button--display: inline-block !default;
+$button--padding-y: (
+  'default': 6px,
+  '-large': 10px,
+  '-small': 5px,
+) !default;
+$button--padding-x: (
+  'default': 12px,
+  '-large': 16px,
+  '-small': 10px,
+) !default;
+
+// Color
+$button--background-color: (
+  'default': #fff,
+  ':hover': #e6e6e6,
+  ':active': #e6e6e6,
+  ':focus': #e6e6e6,
+  '-primary': (
+    'default': #337ab7,
+    ':hover': #286090,
+    ':active': #286090,
+    ':focus': #286090,
+  ),
+) !default;
+$button--border-color:  (
+  'default': #ccc,
+  ':hover': #adadad,
+  ':active': #adadad,
+  ':focus': #adadad,
+  '-primary': (
+    'default': #2e6da4,
+    ':hover': #204d74,
+    ':active': #204d74,
+    ':focus': #204d74,
+  )
+) !default;
+$button--border-color:  (
+  'default': #ccc,
+  ':hover': #adadad,
+  ':active': #adadad,
+  ':focus': #adadad,
+  '-primary': (
+    'default': #2e6da4,
+    ':hover': #204d74,
+    ':active': #204d74,
+    ':focus': #204d74,
+  )
+) !default;
+$button--color: (
+  'default': #333,
+  '-primary': #fff,
+);
+
+// Text
+$button--font-size:  (
+  'default': 14px,
+  '-large': 18px,
+  '-small': 12px,
+) !default;
+$button--font-weight: 400 !default;
+$button--line-height: 1.42857143 !default;
+$button--text-align: center !default;
+$button--text-decoration: none !default;
+
+// Other
+$button--border-radius:  (
+  'default': 4px,
+  '-large': 6px,
+  '-small': 3px,
+) !default;
+$button--border-style: solid !default;

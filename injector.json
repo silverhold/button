@@ -1,0 +1,13 @@
+{
+  "stylevendors": [
+    "@bower/trowel-button/src/scss/button.scss"
+  ],
+  
+  
+  "stylegui": [
+    "@bower/trowel-button/gui/button-gui.scss"
+  ],
+  "templategui": [
+    "@bower/trowel-button/gui/button-gui.html.twig"
+  ]
+}

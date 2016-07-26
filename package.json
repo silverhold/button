@@ -1,0 +1,55 @@
+{
+  "name": "trowel-button",
+  "version": "0.0.0",
+  "description": "A trowel brick for the button visual component",
+  "scripts": {
+    "test": "gulp test",
+    "start": "gulp test_watch",
+    "build": "gulp build",
+    "register": "bower register trowel-button https://github.com/Trowel/button"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trowel/button.git"
+  },
+  "author": "Loïc Goyet <loic@troopers.email>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Trowel/button/issues"
+  },
+  "files": [
+    "src/scss/button.scss",
+    "src/twig/button.html.twig",
+    "dest/css/button.css",
+    "injector.json"
+  ],
+  "keywords": [
+    "scss",
+    "css",
+    "twig",
+    "html",
+    "trowel",
+    "trowel-button",
+    "button"
+  ],
+  "homepage": "https://github.com/Trowel/button#readme",
+  "devDependencies": {
+    "browser-sync": "^2.13.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-ext-replace": "^0.3.0",
+    "gulp-load-plugins": "^1.2.4",
+    "gulp-notify": "^2.2.0",
+    "gulp-prettify": "^0.4.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "gulp-size": "^2.1.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-twig": "^0.5.0",
+    "run-sequence": "^1.2.2"
+  },
+  "dependencies": {
+    "gulp-clean-css": "^2.0.11"
+  }
+}

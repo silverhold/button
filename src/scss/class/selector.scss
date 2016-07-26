@@ -1,0 +1,255 @@
+@import 'utils';
+
+$selector--prototype: (
+  '~': (
+    'classname': 'selector',
+  ),
+  'block': (
+    'type': 'string',
+    'nullable': false,
+    'value': null,
+  ),
+  'element': (
+    'type': 'string',
+    'nullable': true,
+    'value': null,
+  ),
+  'modifier': (
+    'type': 'string',
+    'nullable': true,
+    'value': null,
+  ),
+  'pseudo-element': (
+    'type': 'string',
+    'nullable': true,
+    'value': null,
+  ),
+  'type': (
+    'type': 'string',
+    'nullable': false,
+    'choices': ('.', '#'),
+    'value': null,
+  ),
+  'is-nested': (
+    'type': 'bool',
+    'nullable': false,
+    'value': null,
+  ),
+);
+
+@function selector--constructor($block, $element: null, $modifier: null, $pseudo-element: null, $type: '.', $is-nested: false) {
+  $this: $selector--prototype;
+  $this: selector--set-block($this, $block);
+  $this: selector--set-element($this, $element);
+  $this: selector--set-modifier($this, $modifier);
+  $this: selector--set-pseudo-element($this, $pseudo-element);
+  $this: selector--set-type($this, $type);
+  $this: selector--set-is-nested($this, $is-nested);
+
+  @return $this;
+};
+
+/// @name get block
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} block
+@function selector--get-block($this) {
+  @return class--get-attribute-value($this, 'block');
+}
+
+/// @name set block
+/// @access public
+/// @group class selector
+/// @param {map} $this
+/// @param {string} $block
+/// @return {map} selector class object updated with new 'block' value
+@function selector--set-block($this, $block) {
+  @return class--set-attribute-value($this, 'block', $block);
+}
+
+/// @name get element
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} element
+@function selector--get-element($this) {
+  @return class--get-attribute-value($this, 'element');
+}
+
+/// @name set element
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $element
+/// @return {map} selector class object updated with new 'element' value
+@function selector--set-element($this, $element) {
+  @return class--set-attribute-value($this, 'element', $element);
+}
+
+/// @name get modifier
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} modifier
+@function selector--get-modifier($this) {
+  @return class--get-attribute-value($this, 'modifier');
+}
+
+/// @name set modifier
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $modifier
+/// @return {map} selector class object updated with new 'modifier' value
+@function selector--set-modifier($this, $modifier) {
+  @return class--set-attribute-value($this, 'modifier', $modifier);
+}
+
+/// @name get type
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} type
+@function selector--get-type($this) {
+  @return class--get-attribute-value($this, 'type');
+}
+
+/// @name set type
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $type
+/// @return {map} selector class object updated with new 'type' value
+@function selector--set-type($this, $type) {
+  @return class--set-attribute-value($this, 'type', $type);
+}
+
+/// @name get is-nested
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} is-nested
+@function selector--get-is-nested($this) {
+  @return class--get-attribute-value($this, 'is-nested');
+}
+
+/// @name set is-nested
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $is-nested
+/// @return {map} selector class object updated with new 'is-nested' value
+@function selector--set-is-nested($this, $is-nested) {
+  @return class--set-attribute-value($this, 'is-nested', $is-nested);
+}
+
+/// @name get pseudo-element
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} pseudo-element
+@function selector--get-pseudo-element($this) {
+  @return class--get-attribute-value($this, 'pseudo-element');
+}
+
+/// @name set pseudo-element
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $pseudo-element
+/// @return {map} selector class object updated with new 'pseudo-element' value
+@function selector--set-pseudo-element($this, $pseudo-element) {
+  @return class--set-attribute-value($this, 'pseudo-element', $pseudo-element);
+}
+
+/// @name is block
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @return {bool} does the selector class object is a block selector
+@function selector--is-block($this) {
+  @if selector--get-block($this) and not selector--get-element($this) {
+    @return true;
+  }
+
+  @return false;
+}
+
+/// @name is element
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @return {bool} does the selector class object is an element selector
+@function selector--is-element($this) {
+  @if selector--get-block($this) and selector--get-element($this) {
+    @return true;
+  }
+
+  @return false;
+}
+
+/// @name is modifier
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @return {bool} does the selector class object is an modifier selector
+@function selector--is-modifier($this) {
+  @if selector--get-block($this) and selector--get-modifier($this) {
+    @return true;
+  }
+
+  @return false;
+}
+
+@function selector--get-print($this) {
+  // .block--modifier
+  // .block--modifier .block__element
+  // .block__element
+  // .block
+  // add ::before
+  // add @at-root
+
+  $print: '';
+  $print--type: selector--get-type($this);
+  $print--block: $print--type + selector--get-block($this);
+  $print--modifier: '';
+  $print--element: '';
+
+  @if selector--is-modifier($this) {
+    $print--modifier: $print--block + '--' + selector--get-modifier($this);
+  }
+
+  @if selector--is-element($this) {
+    $print--element: $print--block + '__' + selector--get-element($this);
+  }
+
+  $print: $print--block;
+  @if selector--is-modifier($this) {
+    $print: $print--modifier;
+
+    @if selector--is-element($this) {
+      $print: $print--modifier + ' ' + $print--element;
+    }
+  } @elseif selector--is-element($this) {
+    $print: $print--element;
+  }
+
+  @if selector--get-pseudo-element($this) {
+    $print: $print + selector--get-pseudo-element($this);
+  }
+
+  @return $print;
+}
+
+@mixin selector($this) {
+  @if selector--get-is-nested($this) {
+    @at-root #{selector--get-print($this)} {
+      @content;
+    }
+  } @else {
+    #{selector--get-print($this)} {
+      @content;
+    }
+  }
+}

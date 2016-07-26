@@ -1,0 +1,62 @@
+@function class--get-attribute-property($object, $attribute, $property) {
+  @if map-has-key(map-get($object, $attribute), $property) {
+    @return map-get(map-get($object, $attribute), $property);
+  }
+
+  @return null;
+}
+
+@function class--get-class-name($object) {
+  @return class--get-attribute-property($object, '~', 'classname');
+};
+
+@function class--get-attribute-type($object, $attribute) {
+  @return class--get-attribute-property($object, $attribute, 'type');
+};
+
+@function class--get-attribute-value($object, $attribute) {
+  @return class--get-attribute-property($object, $attribute, 'value');
+};
+
+@function class--get-attribute-nullable($object, $attribute) {
+  @return class--get-attribute-property($object, $attribute, 'nullable');
+};
+
+@function class--get-attribute-choices($object, $attribute) {
+  @return class--get-attribute-property($object, $attribute, 'choices');
+};
+
+
+@function class--set-attribute-value($object, $attribute, $value) {
+  $classname: '$' + class--get-class-name($object);
+
+  $nullable: class--get-attribute-nullable($object, $attribute);
+  $nullable--congruent: ($value == null and $nullable) or $value != null;
+  @if not $nullable--congruent {
+    @error 'the attribute \"#{$attribute}\" from the \"#{$classname}\" cannot be null';
+  }
+
+  $choices: class--get-attribute-choices($object, $attribute);
+  $choices--congruent: ($choices and index($choices, $value)) or not $choices;
+  @if not $choices--congruent {
+    $choices--error: 'the attribute \"#{$attribute}\" from the \"#{$classname}\" must be ';
+    @for $index from 1 through length($choices) {
+      @if $index > 1 {
+        $choices--error: $choices--error + if($index == length($choices), ' or ', ', ');
+      }
+      $choices--error: $choices--error + nth($choices, $index);
+    }
+    @error $choices--error;
+  }
+
+  $type: class--get-attribute-type($object, $attribute);
+  $type--congruent: (type-of($value) == $type) or ($value == null and $nullable);
+  @if not $type--congruent {
+    @error 'the attribute \"#{$attribute}\" from the \"#{$classname}\" class must be a \"#{$type}\" (currently \"#{type-of($value)}\")';
+  }
+
+  $attribute-properties: map-merge(map-get($object, $attribute), ('value': $value));
+  $object: map-merge($object, ($attribute: $attribute-properties));
+
+  @return $object;
+};

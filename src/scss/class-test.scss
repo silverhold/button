@@ -1,0 +1,25 @@
+@import 'class/selector';
+
+// add block tag and element tag
+// add possibility to have several modifiers
+// add states
+// add prefixes
+
+/* testroom for selector object class */
+
+$selector: selector--constructor('button');
+$selector: selector--set-modifier($selector, 'primary');
+
+@include selector($selector) {
+  content: 'button';
+
+  $selector: selector--set-is-nested($selector, true);
+
+  @include selector($selector) {
+    content: 'button primary';
+  }
+}
+
+@include selector(selector--set-element($selector, 'label')) {
+  content: 'button label';
+}

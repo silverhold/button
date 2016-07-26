@@ -1,0 +1,38 @@
+{
+  "name": "trowel-button",
+  "homepage": "https://github.com/Trowel/button",
+  "authors": [
+    "Loïc Goyet <loic@troopers.email>"
+  ],
+  "description": "A trowel brick for the button visual component",
+  "main": [
+    "src/scss/button.scss",
+    "src/twig/button.html.twig",
+    "dest/css/button.css",
+    "injector.json"
+  ],
+  "keywords": [
+    "scss",
+    "css",
+    "twig",
+    "html",
+    "trowel",
+    "trowel-button",
+    "button"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trowel/button.git"
+  },
+  "dependencies": {
+    "trowel-bucket": "^1.8.1",
+    "trowel-responsive": "^1.3.0"
+  }
+}

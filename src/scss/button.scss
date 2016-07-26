@@ -1,0 +1,217 @@
+@import 'variables';
+
+@function selector($selector) {
+  $selector-string: '.' + map-get($selector, 'prefix') + map-get($selector, 'block');
+
+  @if map-has-key($selector, 'element') {
+    $selector-string: $selector-string + '__' + map-get($selector, 'element');
+  }
+
+  @if map-has-key($selector, 'variant') {
+    $selector-string: $selector-string + '--' + map-get($selector, 'variant');
+  }
+
+  @return $selector-string;
+}
+
+@function is-state($string) {
+  @return str-slice($string, 0, 1) == ':';
+};
+
+@function is-media($string) {
+  @return str-slice($string, 0, 1) == '@';
+};
+
+@function is-variant($string) {
+  @return str-slice($string, 0, 1) == '-';
+};
+
+@function flags-has-states($flags-sorted) {
+  @return length(map-get($flags-sorted, 'states')) > 0;
+};
+
+@function flags-has-medias($flags-sorted) {
+  @return length(map-get($flags-sorted, 'medias')) > 0;
+};
+
+@function flags-has-variants($flags-sorted) {
+  // @debug map-get($flags-sorted, 'variants');
+  // @debug length(map-get($flags-sorted, 'variants'));
+  @return length(map-get($flags-sorted, 'variants')) > 0;
+};
+
+@function trowel-variable--add-flag($key, $flags) {
+  @if is-state($key) or is-media($key) or is-variant($key) {
+    $flags: append($flags, $key);
+  }
+  @return $flags;
+}
+
+@function trowel-variable--clean-flags($flags, $length) {
+  $new-flags: ();
+  @if length($flags) > 0 and $length > 0 {
+    @for $n from 1 through $length {
+      $new-flags: append($new-flags, nth($flags, $n));
+    }
+  }
+  @return $new-flags;
+}
+
+@function trowel-variable--sort-flags($flags) {
+  $variants: ();
+  $states: ();
+  $medias: ();
+
+  @each $flag in $flags {
+    @if is-state($flag) {
+      $states: append($states, $flag);
+    }
+
+    @if is-media($flag) {
+      $medias: append($medias, $flag);
+    }
+
+    @if is-variant($flag) {
+      $variants: append($variants, $flag);
+    }
+  }
+
+  @return ('states': $states, 'medias': $medias, 'variants': $variants);
+}
+
+@function trowel-variable--selector-variants($block-selector, $flags) {
+  $variants: map-get($flags, 'variants');
+
+  @if map-has-key($block-selector, 'element') {
+    $block-selector: map-remove($block-selector, ('element'));
+  }
+  $selector-varianted: '';
+
+  @for $index from 1 through length($variants) {
+    $variant: nth($variants, $index);
+    $block-selector: map-merge($block-selector, ('variant': str-slice($variant, 2)));
+    $selector-varianted: $selector-varianted + unquote("#{selector($block-selector)}");
+  }
+
+  @return $selector-varianted;
+}
+
+@function trowel-variable--selector-states($selector, $flags) {
+  $states: map-get($flags, 'states');
+
+  $selector-stated: $selector;
+
+  @for $index from 1 through length($states) {
+    $state: nth($states, $index);
+    $selector-stated: $selector-stated + $state;
+  }
+
+  @return $selector-stated;
+}
+
+@mixin trowel-variable--generator($property, $value, $block-selector, $is-block, $flags) {
+  // sort flags
+  $flags: trowel-variable--sort-flags($flags);
+
+  $selector: '';
+  @if $is-block {
+    $selector: '&';
+  } @else {
+    $selector: #{selector($block-selector)};
+  }
+
+  // take care of variants
+  @if flags-has-variants($flags) {
+    $selector: $selector + trowel-variable--selector-variants($block-selector, $flags);
+  }
+
+  // take care of state
+  @if flags-has-states($flags) {
+    $selector: trowel-variable--selector-states($selector, $flags);
+  }
+
+  // @debug $selector;
+
+  // take care of target selector
+  @if not $is-block {
+    $selector: $selector + ' &';
+  }
+
+  // generate declaration
+  #{$selector} {
+    // generate media query or not
+    @if not flags-has-medias($flags) {
+      #{$property}: $value;
+    } @elseif flags-has-medias($flags) and length(map-get($flags, 'medias')) > 1 {
+      @error 'you cannot have nested a responsive breakpoint into an another one';
+    } @else {
+      $breakpoint: str-slice(nth(map-get($flags, 'medias'), 1), 2);
+
+      @include media-query($breakpoint, 'mobile-first') {
+        #{$property}: $value;
+      }
+    }
+  }
+}
+
+@mixin trowel-variable($property, $variable, $block-selector, $is-block: true, $flags: (), $lvl: 0) {
+  @if type-of($variable) != 'map' and $lvl == 0 {
+    @include trowel-variable--generator($property, $variable, $block-selector, $is-block, $flags);
+  } @else {
+    @each $key, $value in $variable {
+      $flags: trowel-variable--add-flag($key, $flags);
+      @if type-of($value) == 'map' {
+        @include trowel-variable($property, $value, $block-selector, $is-block, $flags, $lvl + 1);
+      } @else {
+        @include trowel-variable--generator($property, $value, $block-selector, $is-block, $flags);
+      }
+      $flags: trowel-variable--clean-flags($flags, $lvl);
+    }
+  }
+}
+
+/**
+ * button
+ */
+
+$block-selector: (
+  'prefix': $button--prefix,
+  'block': 'button',
+);
+
+#{selector($block-selector)} {
+  // scss-lint:disable DeclarationOrder
+
+  // Positioning
+  @include trowel-variable('vertical-align', $button--vertical-align, $block-selector);
+
+  // Display & Box Model
+  @include trowel-variable('border-width', $button--border-width, $block-selector);
+  box-sizing: border-box;
+  @include trowel-variable('display', $button--display, $block-selector);
+  @include trowel-variable('padding-top', $button--padding-y, $block-selector);
+  @include trowel-variable('padding-right', $button--padding-x, $block-selector);
+  @include trowel-variable('padding-bottom', $button--padding-y, $block-selector);
+  @include trowel-variable('padding-left', $button--padding-x, $block-selector);
+
+  // Color
+  @include trowel-variable('background-color', $button--background-color, $block-selector);
+  @include trowel-variable('border-color', $button--border-color, $block-selector);
+  @include trowel-variable('color', $button--color, $block-selector);
+
+  // Text
+  @include trowel-variable('font-size', $button--font-size, $block-selector);
+  @include trowel-variable('font-weight', $button--font-weight, $block-selector);
+  @include trowel-variable('text-align', $button--text-align, $block-selector);
+  @include trowel-variable('text-decoration', $button--text-decoration, $block-selector);
+  user-select: none;
+  white-space: nowrap;
+
+  // Other
+  @include trowel-variable('border-radius', $button--border-radius, $block-selector);
+  @include trowel-variable('border-style', $button--border-style, $block-selector);
+
+  @include when-tag('a') {
+    cursor: pointer;
+  }
+}
