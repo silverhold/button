@@ -4,6 +4,8 @@
 
 // Constructor
 $selector: selector--constructor('button', null, 'primary');
+// $selector: selector--set-block-tag($selector, 'a');
+// $selector: selector--set-element-tag($selector, 'span');
 
 @include selector($selector) {
   content: 'button primary';

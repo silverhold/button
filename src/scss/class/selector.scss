@@ -5,6 +5,7 @@
 // Add property block-state + getter/setter + setup on get-print method
 // Add property element-state + getter/setter + setup on get-print method
 // Add property prefix + getter/setter + setup on get-print method
+// Add media query
 
 $selector--prototype: (
   '~': (
@@ -26,6 +27,14 @@ $selector--prototype: (
     'type': 'string',
     'nullable': true,
   ),
+  'block-tag': (
+    'type': 'string',
+    'nullable': true,
+  ),
+  'element-tag': (
+    'type': 'string',
+    'nullable': true,
+  ),
   'type': (
     'type': 'string',
     'choices': ('.', '#'),
@@ -35,12 +44,14 @@ $selector--prototype: (
   ),
 );
 
-@function selector--constructor($block, $element: null, $modifier: null, $pseudo-element: null, $type: '.', $is-nested: false) {
+@function selector--constructor($block, $element: null, $modifier: null, $pseudo-element: null, $block-tag: null, $element-tag: null, $type: '.', $is-nested: false) {
   $this: $selector--prototype;
   $this: selector--set-block($this, $block);
   $this: selector--set-element($this, $element);
   $this: selector--set-modifier($this, $modifier);
   $this: selector--set-pseudo-element($this, $pseudo-element);
+  $this: selector--set-block-tag($this, $block-tag);
+  $this: selector--set-element-tag($this, $element-tag);
   $this: selector--set-type($this, $type);
   $this: selector--set-is-nested($this, $is-nested);
 
@@ -172,6 +183,44 @@ $selector--prototype: (
   @return class--set-attribute-value($this, 'pseudo-element', $pseudo-element);
 }
 
+/// @name get block-tag
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} block-tag
+@function selector--get-block-tag($this) {
+  @return class--get-attribute-value($this, 'block-tag');
+}
+
+/// @name set block-tag
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $block-tag
+/// @return {map} selector class object updated with new 'block-tag' value
+@function selector--set-block-tag($this, $block-tag) {
+  @return class--set-attribute-value($this, 'block-tag', $block-tag);
+}
+
+/// @name get element-tag
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} element-tag
+@function selector--get-element-tag($this) {
+  @return class--get-attribute-value($this, 'element-tag');
+}
+
+/// @name set element-tag
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $element-tag
+/// @return {map} selector class object updated with new 'element-tag' value
+@function selector--set-element-tag($this, $element-tag) {
+  @return class--set-attribute-value($this, 'element-tag', $element-tag);
+}
+
 /// @name is block
 /// @access public
 /// @group class selector
@@ -222,21 +271,23 @@ $selector--prototype: (
   $print: '';
   $print--type: selector--get-type($this);
   $print--block: $print--type + selector--get-block($this);
+  $print--block-tag: if(selector--get-block-tag($this), selector--get-block-tag($this), '');
   $print--modifier: '';
   $print--element: '';
+  $print--element-tag: if(selector--get-element-tag($this), selector--get-element-tag($this), '');
 
   @if selector--is-modifier($this) {
-    $print--modifier: '';
+    $print--modifier: $print--block-tag;
     @for $index from 1 through length(selector--get-modifier($this)) {
       $print--modifier: $print--modifier + $print--block + '--' + selector--get-modifier($this, $index);
     }
   }
 
   @if selector--is-element($this) {
-    $print--element: $print--block + '__' + selector--get-element($this);
+    $print--element: $print--element-tag + $print--block + '__' + selector--get-element($this);
   }
 
-  $print: $print--block;
+  $print: $print--block-tag + $print--block;
   @if selector--is-modifier($this) {
     $print: $print--modifier;
 
