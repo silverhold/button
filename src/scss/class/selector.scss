@@ -1,10 +1,7 @@
 @import 'utils';
 
-// Add property block-tag + getter/setter + setup on get-print method
-// Add property element-tag + getter/setter + setup on get-print method
-// Add property block-state + getter/setter + setup on get-print method
-// Add property element-state + getter/setter + setup on get-print method
 // Add property prefix + getter/setter + setup on get-print method
+// If there no modifier and an element make sure the block print when there is a block-state
 // Add media query
 
 $selector--prototype: (
@@ -35,6 +32,18 @@ $selector--prototype: (
     'type': 'string',
     'nullable': true,
   ),
+  'block-states': (
+    'type': 'string',
+    'nullable': true,
+    'collection': true,
+    'choices': ('hover', 'focus', 'active', 'visited'),
+  ),
+  'element-states': (
+    'type': 'string',
+    'nullable': true,
+    'collection': true,
+    'choices': ('hover', 'focus', 'active', 'visited'),
+  ),
   'type': (
     'type': 'string',
     'choices': ('.', '#'),
@@ -44,7 +53,7 @@ $selector--prototype: (
   ),
 );
 
-@function selector--constructor($block, $element: null, $modifier: null, $pseudo-element: null, $block-tag: null, $element-tag: null, $type: '.', $is-nested: false) {
+@function selector--constructor($block, $element: null, $modifier: null, $pseudo-element: null, $block-tag: null, $element-tag: null, $block-states: null, $element-states: null, $type: '.', $is-nested: false) {
   $this: $selector--prototype;
   $this: selector--set-block($this, $block);
   $this: selector--set-element($this, $element);
@@ -52,6 +61,8 @@ $selector--prototype: (
   $this: selector--set-pseudo-element($this, $pseudo-element);
   $this: selector--set-block-tag($this, $block-tag);
   $this: selector--set-element-tag($this, $element-tag);
+  $this: selector--set-block-states($this, $block-states);
+  $this: selector--set-element-states($this, $element-states);
   $this: selector--set-type($this, $type);
   $this: selector--set-is-nested($this, $is-nested);
 
@@ -221,6 +232,65 @@ $selector--prototype: (
   @return class--set-attribute-value($this, 'element-tag', $element-tag);
 }
 
+/// @name get block-states
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} block-states
+@function selector--get-block-states($this, $nth: null) {
+  @return class--get-attribute-value($this, 'block-states', $nth);
+}
+
+/// @name set block-states
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $block-states
+/// @return {map} selector class object updated with new 'block-states' value
+@function selector--set-block-states($this, $block-states) {
+  @return class--set-attribute-value($this, 'block-states', $block-states);
+}
+
+/// @name append block-states
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $block-states
+/// @return {map} selector class object updated with new 'block-states' appended to the previous list
+@function selector--append-block-states($this, $block-states) {
+  $previous-value: selector--get-block-states($this);
+  @return class--set-attribute-value($this, 'block-states', $block-states, $previous-value);
+}
+
+/// @name get element-states
+/// @access public
+/// @group class selector
+/// @param {map} $this - the `selector class object`
+/// @return {string} element-states
+@function selector--get-element-states($this, $nth: null) {
+  @return class--get-attribute-value($this, 'element-states', $nth);
+}
+
+/// @name set element-states
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $element-states
+/// @return {map} selector class object updated with new 'element-states' value
+@function selector--set-element-states($this, $element-states) {
+  @return class--set-attribute-value($this, 'element-states', $element-states);
+}
+
+/// @name append element-states
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @param {string} $element-states
+/// @return {map} selector class object updated with new 'element-states' appended to the previous list
+@function selector--append-element-states($this, $element-states) {
+  $previous-value: selector--get-element-states($this);
+  @return class--set-attribute-value($this, 'element-states', $element-states, $previous-value);
+}
 /// @name is block
 /// @access public
 /// @group class selector
@@ -260,6 +330,32 @@ $selector--prototype: (
   @return false;
 }
 
+/// @name is block-states
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @return {bool} does the selector class object is an block-states selector
+@function selector--is-block-states($this) {
+  @if selector--get-block($this) and selector--get-block-states($this) {
+    @return true;
+  }
+
+  @return false;
+}
+
+/// @name is element-states
+/// @access public
+/// @group class selector
+/// @param {map} $selector
+/// @return {bool} does the selector class object is an element-states selector
+@function selector--is-element-states($this) {
+  @if selector--is-element($this) and selector--get-element-states($this) {
+    @return true;
+  }
+
+  @return false;
+}
+
 @function selector--get-print($this) {
   // .block--modifier
   // .block--modifier .block__element
@@ -283,19 +379,33 @@ $selector--prototype: (
     }
   }
 
+  $print--block-states: '';
+  @if selector--is-block-states($this) {
+    @for $index from 1 through length(selector--get-block-states($this)) {
+      $print--block-states: $print--block-states + ':' + selector--get-block-states($this, $index);
+    }
+  }
+
+  $print--element-states: '';
+  @if selector--is-element-states($this) {
+    @for $index from 1 through length(selector--get-element-states($this)) {
+      $print--element-states: $print--element-states + ':' + selector--get-element-states($this, $index);
+    }
+  }
+
   @if selector--is-element($this) {
     $print--element: $print--element-tag + $print--block + '__' + selector--get-element($this);
   }
 
-  $print: $print--block-tag + $print--block;
+  $print: $print--block-tag + $print--block + $print--block-states;
   @if selector--is-modifier($this) {
-    $print: $print--modifier;
+    $print: $print--modifier + $print--block-states;
 
     @if selector--is-element($this) {
-      $print: $print--modifier + ' ' + $print--element;
+      $print: $print--modifier + $print--block-states + ' ' + $print--element + $print--element-states;
     }
   } @elseif selector--is-element($this) {
-    $print: $print--element;
+    $print: $print--element + $print--element-states;
   }
 
   @if selector--get-pseudo-element($this) {

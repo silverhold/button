@@ -4,8 +4,10 @@
 
 // Constructor
 $selector: selector--constructor('button', null, 'primary');
-// $selector: selector--set-block-tag($selector, 'a');
-// $selector: selector--set-element-tag($selector, 'span');
+$selector: selector--set-block-tag($selector, 'a');
+$selector: selector--set-element-tag($selector, 'span');
+$selector: selector--append-block-states($selector, 'hover');
+$selector: selector--append-element-states($selector, 'active');
 
 @include selector($selector) {
   content: 'button primary';

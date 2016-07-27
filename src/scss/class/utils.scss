@@ -47,8 +47,8 @@
   @return $nullable--is-ok;
 }
 
-@function class--attribute-choices-is-ok($attribute, $value, $classname, $choices) {
-  $choices--is-ok: ($choices and index($choices, $value)) or not $choices;
+@function class--attribute-choices-is-ok($attribute, $value, $classname, $choices, $nullable) {
+  $choices--is-ok: ($choices and index($choices, $value)) or not $choices or (not index($choices, $value) and $value == null and $nullable);
   @if not $choices--is-ok {
     $choices--error: 'the attribute \"#{$attribute}\" from the \"#{$classname}\" must be ';
     @for $index from 1 through length($choices) {
@@ -76,7 +76,7 @@
 
 @function class--attribute-is-ok($attribute, $value, $classname, $nullable, $choices, $type) {
   $nullable--is-ok: class--attribute-nullable-is-ok($attribute, $value, $classname, $nullable);
-  $choices--is-ok: class--attribute-choices-is-ok($attribute, $value, $classname, $choices);
+  $choices--is-ok: class--attribute-choices-is-ok($attribute, $value, $classname, $choices, $nullable);
   $type--is-ok: class--attribute-type-is-ok($attribute, $value, $classname, $type, $nullable);
 
   @return $nullable--is-ok and $choices--is-ok and $type--is-ok;
