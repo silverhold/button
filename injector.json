@@ -1,13 +1,13 @@
 {
   "stylevendors": [
-    "@bower/trowel-button/src/scss/button.scss"
+    "@bower/silverhold-button/src/scss/button.scss"
   ],
   
   
   "stylegui": [
-    "@bower/trowel-button/gui/button-gui.scss"
+    "@bower/silverhold-button/gui/button-gui.scss"
   ],
   "templategui": [
-    "@bower/trowel-button/gui/button-gui.html.twig"
+    "@bower/silverhold-button/gui/button-gui.html.twig"
   ]
 }
